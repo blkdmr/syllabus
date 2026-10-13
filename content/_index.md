@@ -6,7 +6,7 @@ banner:
   button:
     enable: true
     label: "Browse Courses"
-    link: "/courses/"
+    link: "courses/"
 
 features:
   - title: "Deep Learning"
@@ -20,5 +20,5 @@ features:
     button:
       enable: true
       label: "Go to course"
-      link: "/courses/deep-learning-fundamentals/"
+      link: "courses/deep-learning-fundamentals/"
 ---
