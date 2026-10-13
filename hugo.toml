@@ -1,8 +1,4 @@
-[security]
-[security.exec]
-allow = ['^(dart-)?sass$', '^go$', '^git$', '^node$', '^postcss$', '^tailwindcss$']
-
-baseURL = "https://blkdmr.github.io/"
+baseURL = "https://blkdmr.github.io/syllabus/"
 title = "Syllabus"
 timeZone = "Europe/Rome"
 summaryLength = 20
@@ -10,6 +6,10 @@ defaultContentLanguage = "en"
 defaultContentLanguageInSubdir = false
 disablePathToLower = true
 hasCJKLanguage = false
+
+[security]
+[security.exec]
+allow = ['^(dart-)?sass$', '^go$', '^git$', '^node$', '^postcss$', '^tailwindcss$']
 
 [services]
 [services.googleAnalytics]
