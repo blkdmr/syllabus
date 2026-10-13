@@ -54,6 +54,9 @@ jobs:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
           HUGO_ENVIRONMENT: production
         run: |
+          # First build populates hugo_stats.json with all used CSS classes.
+          # Second build lets Tailwind read that file and emit the full CSS.
+          hugo --gc --minify
           hugo --gc --minify
 
       - name: Upload artifact
