@@ -1,0 +1,32 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+window.addEventListener("load", function() {
+  if (typeof katex === "undefined") return;
+  var blocks = document.querySelectorAll(".katex-display-raw");
+  var inlines = document.querySelectorAll(".katex-inline-raw");
+  var all = [];
+  blocks.forEach(function(el) { all.push({el: el, display: true}); });
+  inlines.forEach(function(el) { all.push({el: el, display: false}); });
+  var i = 0;
+  function renderBatch() {
+    var end = Math.min(i + 10, all.length);
+    for (; i < end; i++) {
+      var item = all[i];
+      var tex = item.el.textContent;
+      if (item.display) {
+        var container = item.el.parentElement;
+        try { katex.render(tex, container, {displayMode: true, throwOnError: false}); }
+        catch(e) { container.textContent = tex; }
+      } else {
+        var span = document.createElement("span");
+        try { katex.render(tex, span, {displayMode: false, throwOnError: false}); }
+        catch(e) { span.textContent = tex; }
+        item.el.parentElement.replaceChild(span, item.el);
+      }
+    }
+    if (i < all.length) setTimeout(renderBatch, 0);
+  }
+  if (all.length > 0) setTimeout(renderBatch, 0);
+});
+</script>

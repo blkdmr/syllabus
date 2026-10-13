@@ -1,0 +1,30 @@
+[[main]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[main]]
+name = "Courses"
+weight = 2
+
+[[main]]
+parent = "Courses"
+name = "Deep Learning"
+url = "/courses/deep-learning-fundamentals/"
+weight = 1
+
+[[main]]
+parent = "Courses"
+name = "JEPA"
+url = "/courses/jepa/"
+weight = 2
+
+[[footer]]
+name = "Home"
+url = "/"
+weight = 1
+
+[[footer]]
+name = "Courses"
+url = "/courses/"
+weight = 2

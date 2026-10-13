@@ -1,0 +1,174 @@
+[security]
+[security.exec]
+allow = ['^(dart-)?sass$', '^go$', '^git$', '^node$', '^postcss$', '^tailwindcss$']
+
+baseURL = "https://blkdmr.github.io/"
+title = "Syllabus"
+timeZone = "Europe/Rome"
+summaryLength = 20
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = false
+disablePathToLower = true
+hasCJKLanguage = false
+
+[services]
+[services.googleAnalytics]
+ID = ""
+
+[permalinks.page]
+"pages" = "/:slugorcontentbasename/"
+
+[pagination]
+pagerSize = 20
+
+[build]
+[build.buildStats]
+enable = true
+[[build.cachebusters]]
+source = "assets/notwatching/hugo_stats\\.json"
+target = "css"
+
+[module]
+[[module.imports]]
+path = "github.com/zeon-studio/hugoplate"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/images"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/search"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/pwa"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/seo-tools/basic-seo"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/seo-tools/google-tag-manager"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/seo-tools/site-verifications"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/custom-script"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/preloader"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/cookie-consent"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/render-link"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/social-share"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/icons/font-awesome"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/gzip-caching"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/table-of-contents"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/accordion"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/tab"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/modal"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/gallery-slider"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/videos"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/shortcodes/button"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/shortcodes/notice"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/announcement"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/adsense"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/shortcodes/mermaid"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/components/open-remark"
+[[module.imports]]
+path = "github.com/gethugothemes/hugo-modules/llms-txt"
+
+[[module.mounts]]
+source = "assets"
+target = "assets"
+[[module.mounts]]
+disableWatch = true
+source = "hugo_stats.json"
+target = "assets/notwatching/hugo_stats.json"
+
+[outputs]
+home = ["HTML", "RSS", "WebAppManifest", "SearchIndex"]
+page = ["HTML", "RSS"]
+section = ["HTML", "RSS"]
+taxonomy = ["HTML", "RSS"]
+term = ["HTML", "RSS"]
+
+[imaging]
+resampleFilter = "Lanczos"
+[imaging.jpeg]
+quality = 80
+[imaging.webp]
+quality = 80
+
+[caches]
+[caches.images]
+dir = ":resourceDir/_gen"
+maxAge = "720h"
+[caches.assets]
+dir = ":resourceDir/_gen"
+maxAge = "720h"
+
+[markup]
+[markup.goldmark.renderer]
+unsafe = true
+[markup.goldmark.extensions]
+[markup.goldmark.extensions.passthrough]
+enable = true
+[markup.goldmark.extensions.passthrough.delimiters]
+block = [['$$', '$$']]
+inline = [['\\(', '\\)'], ['$', '$']]
+[markup.highlight]
+style = "monokai"
+lineNumbersInTable = false
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 4
+ordered = true
+
+[mediaTypes]
+[mediaTypes."application/manifest+json"]
+suffixes = ["webmanifest"]
+
+[outputFormats]
+[outputFormats.WebAppManifest]
+mediaType = "application/manifest+json"
+rel = "manifest"
+[outputFormats.SearchIndex]
+mediaType = "application/json"
+baseName = "searchindex"
+isPlainText = true
+notAlternative = true
+
+# CSS Plugins
+[[params.plugins.css]]
+link = "plugins/font-awesome/v6/brands.css"
+lazy = true
+[[params.plugins.css]]
+link = "plugins/font-awesome/v6/solid.css"
+lazy = true
+[[params.plugins.css]]
+link = "plugins/font-awesome/v6/icons.css"
+lazy = true
+
+# JS Plugins
+[[params.plugins.js]]
+link = "js/search.js"
+lazy = false
+[[params.plugins.js]]
+link = "plugins/cookie.js"
+lazy = false
+[[params.plugins.js]]
+link = "js/accordion.js"
+lazy = true
+[[params.plugins.js]]
+link = "js/tab.js"
+lazy = true
+[[params.plugins.js]]
+link = "js/modal.js"
+lazy = true

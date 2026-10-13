@@ -1,0 +1,22 @@
+{{ define "main" }}
+  {{ partial "page-header" . }}
+
+  <section class="section">
+    <div class="container">
+      <ul class="text-center">
+        {{ range .Pages.ByWeight }}
+          <li class="m-3">
+            <a
+              href="{{ .Permalink }}"
+              class="text-text-dark dark:text-darkmode-text-dark block text-xl">
+              {{ .Title }}
+            </a>
+            {{ with .Description }}
+              <p class="text-text-light dark:text-darkmode-text-light">{{ . }}</p>
+            {{ end }}
+          </li>
+        {{ end }}
+      </ul>
+    </div>
+  </section>
+{{ end }}

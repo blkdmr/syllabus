@@ -1,0 +1,62 @@
+favicon = ""
+logo = ""
+logo_darkmode = ""
+logo_text = "Syllabus"
+logo_width = "150px"
+logo_height = "30px"
+mainSections = ["courses"]
+contact_form_action = "#"
+feedback_form_action = "#"
+
+# Navbar
+navbar_fixed = true
+theme_switcher = true
+default_theme = "system"
+
+# Search
+[search]
+enable = true
+primary_section = "courses"
+include_sections = ["courses"]
+show_image = false
+show_description = true
+show_tags = true
+show_categories = true
+
+# SEO
+[metadata]
+meta_author = ""
+meta_description = "Course materials for Deep Learning"
+meta_keywords = ["machine learning", "deep learning", "course", "university"]
+
+# Preloader
+[preloader]
+enable = false
+
+# Google map
+[google_map]
+enable = false
+
+# Subscription
+[subscription]
+enable = false
+
+# Cookie
+[cookies]
+enable = false
+
+# Announcement
+[announcement]
+enable = false
+
+# OpenRemark
+[open_remark]
+enable = false
+
+# LLMs text
+[llms_txt]
+enable = false
+
+# Mermaid
+[mermaid]
+enable = false
