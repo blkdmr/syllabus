@@ -8,8 +8,11 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.0",
     "@tailwindcss/forms": "^0.5.11",
-    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/typography": "^0.5.4",
     "tailwind-bootstrap-grid": "^7.0.0",
     "tailwindcss": "^4.3.0"
+  },
+  "overrides": {
+    "@parcel/watcher": "2.6.0"
   }
 }
