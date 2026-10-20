@@ -1,27 +1,6 @@
-# I-JEPA: A Self-Contained Guide to the Method and Its PyTorch Implementation
+# I-JEPA
 
-*From the original paper to a practical ViT-Tiny implementation*
-
-**Primary sources**
-
-- [Paper — *Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture* (Assran et al., CVPR 2023)](https://arxiv.org/pdf/2301.08243)
-- [Official PyTorch implementation — `facebookresearch/ijepa`](https://github.com/facebookresearch/ijepa)
-
-This guide explains the theoretical foundations, architecture, training objective, and implementation of **Image-based Joint-Embedding Predictive Architecture (I-JEPA)**.
-
-It assumes familiarity with the general JEPA framework, self-supervised learning, and basic neural network training. Some understanding of Vision Transformers (ViTs) is useful, but their internal operation is explained where necessary.
-
-The emphasis is on **what each component computes, how information flows through the architecture, and how those computations translate into PyTorch**.
-
-We use **ViT-Tiny** as a running implementation example. Although ViT-Tiny is defined in the official repository, the paper's reported experiments primarily use larger architectures. Our Tiny configuration is therefore an educational adaptation, not a reproduction of an officially reported ViT-Tiny experiment.
-
-Distributed and parallel training details are intentionally excluded.
-
----
-
-## Part I — The I-JEPA Method
-
-## 1. The central idea of I-JEPA
+#### The central idea of I-JEPA
 
 I-JEPA is a non-generative, self-supervised learning method designed to learn semantic image representations through prediction in latent space.
 
@@ -86,35 +65,29 @@ Two design decisions are especially important:
 
 Both are central to the method rather than incidental implementation details.
 
-## 2. Mathematical formulation
 
-Let an input image be
+### Mathematical formulation
 
-$$
-I \in \mathbb{R}^{3\times H\times W}.
-$$
-
-Divide it into non-overlapping square patches of size $P\times P$. Assuming $H$ and $W$ are divisible by $P$, the number of patches is
+Let an input image be $ I \in \mathbb{R}^{3\times H\times W}.$  Divide it into non-overlapping square patches of size $P\times P$. Assuming $H$ and $W$ are divisible by $P$, the number of patches is
 
 $$
-N=\frac{H}{P}\frac{W}{P}.
+N=\frac{H}{P}\times\frac{W}{P}.
 $$
 
-For a $224\times224$ image with patch size $16$:
+--- 
+**Example.** For a $224\times224$ image with patch size $16$:
 
 $$
-N=\frac{224}{16}\frac{224}{16}=196,
+N=\frac{224}{16}\times\frac{224}{16}=196,
 $$
 
 arranged in a $14\times14$ grid.
 
-I-JEPA contains three networks.
+---
 
-### 2.1 Context encoder
+##### Context encoder
 
-The context encoder is $f_\theta$. It receives only the visible context patches.
-
-Let $C\subseteq\{1,\ldots,N\}$ denote their indices. The context representations are
+The context encoder is $f_\theta$. It receives only the visible context patches. Let $C\subseteq\{1,\ldots,N\}$ denote their indices. The context representations are
 
 $$
 S_C=f_\theta(I;C).
@@ -462,9 +435,9 @@ The official repository is organized around a few important files:
 
 Suggested reading order: **`vision_transformer.py` → `multiblock.py` → `train.py` → `helper.py`**.
 
-## 6. ViT-Tiny: understanding the backbone
+## Understanding the backbone
 
-The repository provides several Vision Transformer configurations, including `vit_tiny`. Its definition is:
+Vit tiny example
 
 ```python
 def vit_tiny(patch_size=16, **kwargs):
@@ -481,13 +454,9 @@ def vit_tiny(patch_size=16, **kwargs):
     return model
 ```
 
-Source: [`vision_transformer.py`](https://github.com/facebookresearch/ijepa/blob/main/src/models/vision_transformer.py).
-
-The architecture is:
-
 | Hyperparameter | ViT-Tiny |
 |---|---|
-| Input resolution in this example | $224\times224$ |
+| Input resolution in this exafmple | $224\times224$ |
 | Patch size | $16\times16$ |
 | Number of patches | 196 |
 | Embedding dimension | 192 |
@@ -501,15 +470,15 @@ The architecture is:
 
 The key architectural difference between ViT-Tiny and larger I-JEPA backbones is primarily model capacity. The JEPA training mechanism is the same.
 
-### 6.1 Patch embedding
+#### Patch embedding
 
-For a batch of images:
+For a batch of images
 
 ```python
 images.shape = [B, 3, 224, 224]
 ```
 
-The repository implements patch embedding with a convolution:
+The repository implements patch embedding with a convolution
 
 ```python
 self.proj = nn.Conv2d(
@@ -520,17 +489,15 @@ self.proj = nn.Conv2d(
 )
 ```
 
-For ViT-Tiny this is equivalent to:
+For ViT-Tiny this is equivalent to
 
 ```python
 nn.Conv2d(3, 192, kernel_size=16, stride=16)
 ```
 
-Each $16\times16$ RGB patch contains
+Each $16\times16$ RGB patch contains 
 
-$$
-16\times16\times3=768
-$$
+$$16\times16\times3=768$$ 
 
 pixel values, and the convolution learns a projection
 
@@ -538,19 +505,19 @@ $$
 \mathbb{R}^{768}\longrightarrow\mathbb{R}^{192}.
 $$
 
-The convolution produces:
+The convolution produces
 
 ```python
 [B, 192, 14, 14]
 ```
 
-The output is flattened and transposed:
+The output is flattened and transposed
 
 ```python
 x = self.proj(x).flatten(2).transpose(1, 2)
 ```
 
-resulting in:
+resulting in
 
 ```python
 [B, 196, 192]
@@ -558,69 +525,125 @@ resulting in:
 
 Each of the 196 tokens now represents one image patch.
 
-### 6.2 Positional embeddings
+#### Positional embeddings
 
-Plain self-attention has no inherent representation of spatial order, so I-JEPA adds positional embeddings to the patch tokens.
+The self-attention mechanism is inherently permutation-equivariant: without positional information, it processes patch tokens based on their content but has no explicit knowledge of their spatial arrangement within the image.
 
-Let
+To preserve this spatial information, I-JEPA adds **positional embeddings** to the patch representations before passing them through the Transformer encoder. To incorporate spatial information, I-JEPA uses a positional embedding matrix 
+$E\in\mathbb{R}^{196\times192},$ where each row $p_j\in\mathbb{R}^{192}$ represents the spatial position of patch $j$.
 
-$$
-E\in\mathbb{R}^{196\times192}
-$$
-
-be the positional embedding matrix. For patch $j$:
+The positional embedding is added element-wise to the corresponding patch embedding:
 
 $$
-z_j=e_j+p_j.
+\boxed{z_j=e_j+p_j}
 $$
 
-The repository uses **fixed 2D sine-cosine positional embeddings**, not learned encoder positions:
+where:
+
+- $e_j$ is the content-dependent patch embedding.
+- $p_j$ is the position-dependent embedding.
+- $z_j$ is the resulting token representation passed to the Transformer.
+
+Consequently, each token contains information about both **what is present in the patch** and **where the patch is located within the image**.
+
+##### Fixed 2D sine-cosine positional embeddings
+
+In the official I-JEPA implementation, positional embeddings are *fixed 2D sine-cosine encodings*. Since image patches are arranged on a two-dimensional grid, each patch is associated with spatial coordinates $(x_j,y_j)$, corresponding to its position along the horizontal and vertical axes. The positional embedding is constructed by applying sinusoidal functions at different frequencies to these coordinates.
+
+More precisely, the embedding dimension is divided into two equal parts:
+
+$$
+p_j=
+\left[
+PE_x(x_j)\; ;\; PE_y(y_j)
+\right],
+$$
+
+where:
+
+$$
+PE_x(x_j),PE_y(y_j)\in\mathbb{R}^{96}.
+$$
+
+Each component uses sine and cosine functions with predefined frequencies. In the implementation, the 1D sinusoidal encoding is computed as:
+
+$$
+PE_{1D}(u)=
+\left[
+\sin(u\omega_0),\ldots,\sin(u\omega_{47}),
+\cos(u\omega_0),\ldots,\cos(u\omega_{47})
+\right],
+$$
+
+with:
+
+$$
+\omega_k=\frac{1}{10000^{k/48}},
+\qquad k=0,\ldots,47.
+$$
+
+The resulting 192-dimensional vector encodes both spatial coordinates of the patch.
+
+Because these encodings are deterministic, **each position in the patch grid is associated with a fixed positional vector**, independently of the image content.
+
+--- 
+
+###### Implementation in I-JEPA
+
+The encoder initializes the positional embeddings as follows
 
 ```python
 self.pos_embed = nn.Parameter(
     torch.zeros(1, num_patches, embed_dim),
     requires_grad=False
 )
-```
 
-The values are filled with deterministic sinusoidal encodings of 2D patch-grid coordinates. The resulting tensor still has shape `[B, 196, 192]`.
-
-### 6.3 Masking happens before the Transformer blocks
-
-The important order in `VisionTransformer.forward()` is:
-
-```python
-x = self.patch_embed(x)
-
-pos_embed = self.interpolate_pos_encoding(
-    x, self.pos_embed
+pos_embed = get_2d_sincos_pos_embed(
+    self.pos_embed.shape[-1],
+    int(self.patch_embed.num_patches**.5),
+    cls_token=False
 )
 
-x = x + pos_embed
-
-if masks is not None:
-    x = apply_masks(x, masks)
-
-for blk in self.blocks:
-    x = blk(x)
+self.pos_embed.data.copy_(
+    torch.from_numpy(pos_embed).float().unsqueeze(0)
+)
 ```
 
-In short:
+The tensor is initially filled with zeros and subsequently populated with the deterministic sinusoidal encodings generated by `get_2d_sincos_pos_embed()`. The argument `requires_grad=False` ensures that these positional embeddings remain unchanged during gradient-based optimization.
+
+During the encoder's forward pass, the positional embeddings are added to the patch representations
+
+```python
+# Patch embedding
+x = self.patch_embed(x)
+
+# Add positional embeddings
+pos_embed = self.interpolate_pos_encoding(x, self.pos_embed)
+x = x + pos_embed
+
+# Apply context masks
+if masks is not None:
+    x = apply_masks(x, masks)
+```
+
+Importantly, **positional embeddings are added before context masking**. Therefore, each patch receives its positional information while the complete sequence of 196 patch tokens is still available.
+
+After positional encoding, the tensor retains its original dimensions: $Z\in\mathbb{R}^{B\times196\times192}.$ However, the subsequent masking operation selects only the tokens belonging to the context regions.
+
+For a single context mask per image, the resulting representation has shape
 
 $$
-\boxed{
-\text{Patch embedding}
-\rightarrow\text{Add positions}
-\rightarrow\text{Select context}
-\rightarrow\text{Transformer}
-}
+Z_{\text{context}}
+\in\mathbb{R}^{B\times N_{\text{context}}\times192},
 $$
 
-If the context retains $K=85$ patches, the tensor becomes `[B, 85, 192]` **before entering the Transformer**.
+where $N_{\text{context}}\leq196$ is the number of selected context patches.
 
-Consequently, the context encoder cannot attend to missing target tokens, and visible tokens retain their original spatial positions because positions were added before selection.
+Thus, the Transformer encoder processes only the selected context tokens, while their positional embeddings preserve information about their original locations in the full image grid.
 
-### 6.4 Inside a ViT-Tiny Transformer block
+Finally, I-JEPA also defines a **separate set of fixed 2D sine-cosine positional embeddings for the predictor**. These are used to provide spatial information about both the context tokens and the target positions whose representations must be predicted.
+
+#### Inside a Transformer block
 
 Each block contains multi-head self-attention and a feed-forward MLP in a pre-normalization residual architecture:
 
@@ -1020,7 +1043,7 @@ With default $\beta=1$, PyTorch's Smooth L1 loss for a scalar error $e=\hat s-s$
 $$
 \ell(e)=
 \begin{cases}
-\tfrac12e^2, & |e|<1,\\[4pt]
+\tfrac12e^2, & |e|<1,\$$4pt]
 |e|-\tfrac12, & |e|\geq1.
 \end{cases}
 $$
